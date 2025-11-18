@@ -30,7 +30,7 @@ app.get("/admin", isAdmin, (req:Request, res: Response)=>{
 });
 
 //ruta para usuarios
-app.use("/api/usuarios", usuarioRoutes)
+app.use("/api/usuarios",usuarioRoutes)
 
 
 //// Iniciar servidor
