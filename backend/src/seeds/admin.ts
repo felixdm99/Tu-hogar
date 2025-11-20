@@ -1,13 +1,13 @@
 import mongoose from "mongoose";
 import { connectDB } from "../config/config";
-import Usuario from "../models/model.usuario";
+import Usuario from "../models/user.model";
 import bcrypt from "bcrypt";
 
 const crearAdmin = async ()=> {
     await connectDB();
 
     const emailAdmin="adminQecommerce.com";
-     //verifica si ya existe
+    
 
     const adminExistente = await Usuario.findOne({email : emailAdmin});
     if (adminExistente){
@@ -16,12 +16,12 @@ const crearAdmin = async ()=> {
     }
 
     const hashedPassword = await bcrypt.hash("admin123 ", 10);
-//crea un admin con correo y contraseña
+
     const admin= new Usuario({
         nombre:"Admin",
         apellido: "Ecommerce",
         email: emailAdmin,
-        password: hashedPassword,//la contraseña se guarda hasheada
+        password: hashedPassword,
         role:"admin"
     });
 
