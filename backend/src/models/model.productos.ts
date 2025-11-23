@@ -1,26 +1,3 @@
-<<<<<<< HEAD
-import mongoose, { Schema, Document} from "mongoose";
-export interface IProducto extends Document{
-    nombre: string;
-    precio: number;
-    stock: number;
-    categoria: string;
-    imagen: string;
-    orden: "asc" | "desc"
-
-} 
-
-const ProductoSchema: Schema = new Schema({
-    nombre: { type: String, required: true},
-    precio: { type: Number, required: true},
-    stock: { type: Number, required: true},
-    categoria: { type: String, required: true},
-    imagen: { type: String, required: true},
-
-});
-
-export default mongoose.model<IProducto>("Producto", ProductoSchema);
-=======
 import { Schema, model, Document } from "mongoose";
 
 export interface IProduct extends Document {
@@ -134,4 +111,3 @@ const productSchema = new Schema<IProduct>(
 );
 
 export const ProductModel = model<IProduct>("Product", productSchema);
->>>>>>> 57292a5e3af94c0779710718f230f8f3660c4e8a
