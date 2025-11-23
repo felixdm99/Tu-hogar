@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
+<<<<<<< HEAD
 import { createUserService, LoginUserService, getUserByEmailService, updateLastLoginService} from "../services/services.usuario"; 
+=======
+import { createUserService, LoginUserService, getUserByEmailService, updateLastLoginService} from "../services/user.services"; 
+>>>>>>> 57292a5e3af94c0779710718f230f8f3660c4e8a
 
 export const registerUserController = async (req:Request, res: Response) =>{
     try{
