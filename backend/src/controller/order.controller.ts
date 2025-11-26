@@ -40,5 +40,68 @@ export const getOrdersController = async (req: Request, res: Response) => {
         res.status(500).json({ message: error.message });
     }
 };
+export const cancelOrderController = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+
+        const order = await OrderModel.findById(id);
+        if (!order) return res.status(404).json({ message: "Orden no encontrada" });
+
+        if (order.status === "enviado" || order.status === "completado") {
+            return res.status(400).json({ message: "No se puede cancelar una orden ya procesada o completada" });
+        }
+
+        if (order.status === "cancelada") {
+            return res.status(400).json({ message: "La orden ya estaba cancelada" });
+        }
+
+        order.status = "cancelada";
+        await order.save();
+
+        res.status(200).json({
+            message: "Orden cancelada correctamente",
+            order
+        });
+
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+export const updateOrderStatusController = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        const validStatuses = [
+            "pendiente", 
+            "pagado", 
+            "procesando", 
+            "enviado", 
+            "completado", 
+            "cancelada"
+        ];
+
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({ message: "Estado inválido" });
+        }
+
+        const order = await OrderModel.findById(id);
+        if (!order) return res.status(404).json({ message: "Orden no encontrada" });
+
+        order.status = status;
+        await order.save();
+
+        res.status(200).json({
+            message: "Estado actualizado correctamente",
+            order
+        });
+
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 
 export const orderController = new OrderController();

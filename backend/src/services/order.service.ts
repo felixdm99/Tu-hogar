@@ -6,7 +6,7 @@ export class OrderService {
 
     static async createOrder(data: any) {
 
-        
+    
         const user = await UserModel.findById(data.customer);
         if (!user) throw new Error("El usuario no existe");
 
@@ -27,7 +27,7 @@ export class OrderService {
             itemsProcessed.push({
                 product: productDB._id,
                 name: productDB.name,
-                price: productDB.price,
+                price: productDB.price.regular,
                 quantity: item.quantity,
                 subtotal: itemSubtotal,
                 attributes: item.attributes || {},
@@ -35,12 +35,16 @@ export class OrderService {
 
             subtotal += itemSubtotal;
 
-            
+    
             productDB.inventory.quantity -= item.quantity;
             await productDB.save();
         }
 
-        const total = subtotal + data.payment.cost;
+
+        const tax = data.tax ?? 0;
+        const discount = data.discount ?? 0;
+
+        const total = subtotal + data.shipping.cost + tax - discount;
 
         const orderNumber = "ORD-" + Date.now();
 
@@ -50,22 +54,33 @@ export class OrderService {
             items: itemsProcessed,
             totals: {
                 subtotal,
-                shipping: data.payment.cost,
+                shipping: data.shipping.cost,
+                tax,
+                discount,
                 total,
             },
             shippingAddress: data.shippingAddress,
             billingAddress: data.billingAddress,
             payment: {
                 method: data.payment.method,
-                cost: data.payment.cost,
-                status: "pendiente",
+                status: data.payment.status ?? "pending",
+                transactionId: data.payment.transactionId ?? "",
+                paidAt: data.payment.paidAt ?? null,
             },
-            status: "pendiente",
+            shipping: {
+                method: data.shipping.method,
+                trackingNumber: data.shipping.trackingNumber ?? "",
+                status: data.shipping.status ?? "preparing",
+                cost: data.shipping.cost,
+            },
+            status: "pending",
+            notes: data.notes,
         });
 
         await order.save();
         return order;
     }
+
     static async getOrders() {
         return await OrderModel.find()
             .populate("customer", "name email")

@@ -31,11 +31,7 @@ export interface IProduct extends Document {
   };
   specifications: Map<string, any>;
   tags: string[];
-  seo: {
-    metaTitle: string;
-    metaDescription: string;
-    slug: string;
-  };
+
   status: "active" | "inactive" | "draft";
   featured: boolean;
   ratings: {
@@ -88,11 +84,6 @@ const productSchema = new Schema<IProduct>(
 
     tags: [String],
 
-    seo: {
-      metaTitle: String,
-      metaDescription: String,
-      slug: { type: String, unique: true }
-    },
 
     status: {
       type: String,
