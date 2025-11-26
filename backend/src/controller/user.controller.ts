@@ -1,109 +1,49 @@
 import { Request, Response } from "express";
-import { OrderService } from "../services/order.service";
-import { OrderModel } from "../models/order.model";
-import { ProductModel } from "../models/product.model";
+import { createUserService, LoginUserService, getUserByEmailService, updateLastLoginService} from "../services/user.services"; 
 
+export const registerUserController = async (req:Request, res: Response) =>{
+    try{
+        const data = req.body;
 
-export class OrderController {
-    static async createOrder(req: Request, res: Response) {
-        try {
-            const data = req.body;
-            const order = await OrderService.createOrder(data);
-
-            return res.status(201).json({
-                ok: true,
-                message: "Orden creada exitosamente",
-                order,
-            });
-        } catch (error: any) {
-            console.error("Error al crear la orden", error);
-
-            return res.status(400).json({
-                ok: false,
-                message: error.message || "Error al crear orden",
-            });
+        if (!data.email || !data.password){
+            return res.status(400).json({message: "Email y constraseña son obligatorios"})
         }
-    }
-}
 
-
-export const getOrdersController = async (req: Request, res: Response) => {
-    try {
-        const orders = await OrderModel.find()
-            .populate("customer", "name email")
-            .populate("items.product", "name price");
-
-        res.status(200).json({
-            message: "Órdenes obtenidas correctamente",
-            total: orders.length,
-            orders
-        });
+        const newUser = await createUserService(data);
+        return res.status(201).json(newUser);
     } catch (error: any) {
-        res.status(500).json({ message: error.message });
+        return res.status(400).json({ message: error.message});
     }
 };
 
+export const LoginUserController= async (req: Request, res: Response) =>{
+    try{
+        const {email, password} = req.body;
 
-export const cancelOrderController = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
+const { user, token } = await LoginUserService(email, password);
 
-        const order = await OrderModel.findById(id);
-        if (!order) return res.status(404).json({ message: "Orden no encontrada" });
+await updateLastLoginService(user._id);
 
-        if (order.status === "enviado" || order.status === "completado") {
-            return res.status(400).json({ message: "No se puede cancelar una orden ya procesada o completada" });
-        }
-
-        if (order.status === "cancelada") {
-            return res.status(400).json({ message: "La orden ya estaba cancelada" });
-        }
-
-        for (const item of order.items) {
-            const product = await ProductModel.findById(item.product);
-            if (product) {
-                product.inventory.quantity += item.quantity;
-                await product.save();
-            }
-        }
-
-        order.status = "cancelada";
-        await order.save();
-
-        res.status(200).json({
-            message: "Orden cancelada correctamente",
-            order
-        });
-
-    } catch (error: any) {
-        res.status(500).json({ message: error.message });
+return res.json({
+    message: "Login exitoso",
+    user,
+    token
+});
+    } catch(error: any){
+        return res.status(400).json({message: error.message});
     }
 };
 
-export const updateOrderStatusController = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const { status } = req.body;
+export const getUserByEmailController= async (req: Request, res: Response) =>{
+    try{
+        const email = req.params.email;
+        const user= await getUserByEmailService(email);
 
-        const validStatuses = ["pendiente", "pagado", "procesando", "enviado", "completado", "cancelada"];
-        if (!validStatuses.includes(status)) {
-            return res.status(400).json({ message: "Estado inválido" });
+        if(!user){
+            return res.status(404).json({message: "Usuario no encontrado"});
         }
-
-        const order = await OrderModel.findById(id);
-        if (!order) return res.status(404).json({ message: "Orden no encontrada" });
-
-        order.status = status;
-        await order.save();
-
-        res.status(200).json({
-            message: "Estado actualizado",
-            order
-        });
-
-    } catch (error: any) {
-        res.status(500).json({ message: error.message });
+        return res.json(user);
+    } catch(error: any){
+        return res.status(400).json({message: error.message});
     }
 };
-
-export const orderController = new OrderController();
