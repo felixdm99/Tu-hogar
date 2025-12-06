@@ -1,20 +1,24 @@
 import express from "express";
+import cors from "cors";
 import { connectDB } from "./config/config";
 import userRoutes from "./routes/user.routes"
 import productRoutes from "./routes/product.routes"
 import categoryRoutes from "./routes/category.routes";
 import orderRoutes from "./routes/order.routes";
 import cartRoutes from "./routes/cart.routes";
-import reviewRoutes from "./routes/review.routes"
+import reviewRoutes from "./routes/review.routes";
 
 
 
-const PORT = 3000;
+const PORT = 4000;
 const hostname = "localhost";
 const app = express();
 
 
 connectDB();
+
+app.use(cors());
+console.log("CORS ACTIVADO");
 
 app.use(express.json());
 
