@@ -3,13 +3,8 @@ import { addItemController, getCartController, clearCartController } from "../co
 
 const router = Router();
 
-
 router.post("/add", addItemController);
-
-
 router.get("/", getCartController);
-
-
 router.delete("/clear", clearCartController);
 
 export default router;

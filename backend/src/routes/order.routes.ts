@@ -8,7 +8,6 @@ import {
 
 const router = Router();
 
-
 router.post("/", OrderController.createOrder);
 
 router.get("/", getOrdersController);

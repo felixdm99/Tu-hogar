@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
+
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -11,21 +14,27 @@ export default function LoginPage() {
 
   async function handleSubmit(e: any) {
     e.preventDefault();
+
     try {
-      const res = await axios.post("http://localhost:4000/api/users/login", form);
+      const res = await axios.post(
+        "http://localhost:4000/api/users/login",
+        form
+      );
 
       console.log("LOGIN OK:", res.data);
 
-      alert("Inicio de sesión exitoso");
-
-      // Si querés guardar token:
+      // Guarda token si existe (cuando lo agreguemos)
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
       }
 
+      alert("Inicio de sesión exitoso");
+      router.push("/home");
+
     } catch (err: any) {
-      console.error(err);
-      alert("Error al iniciar sesión");
+      console.error("LOGIN ERROR:", err.response?.data);
+
+      alert(err.response?.data?.msg || "Email o contraseña incorrectos");
     }
   }
 
@@ -48,7 +57,9 @@ export default function LoginPage() {
           type="password"
           placeholder="Contraseña"
           value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
+          onChange={(e) =>
+            setForm({ ...form, password: e.target.value })
+          }
         />
 
         <button type="submit">Ingresar</button>

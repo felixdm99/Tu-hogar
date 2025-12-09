@@ -31,7 +31,11 @@ export interface IProduct extends Document {
   };
   specifications: Map<string, any>;
   tags: string[];
-
+  /*seo: {
+    metaTitle: String;
+    metaDescription: String;
+    slug: { type: String, unique: true }
+  }*/
   status: "active" | "inactive" | "draft";
   featured: boolean;
   ratings: {
@@ -48,24 +52,20 @@ const productSchema = new Schema<IProduct>(
     name: { type: String, required: true },
     description: String,
     shortDescription: String,
-
     price: {
       regular: { type: Number, required: true },
       sale: { type: Number, default: 0 },
       currency: { type: String, default: "USD" }
     },
-
     category: { type: Schema.Types.ObjectId, ref: "Category" },
     brand: String,
     images: [String],
-
     inventory: {
       quantity: { type: Number, default: 0 },
       lowStockThreshold: { type: Number, default: 5 },
       trackQuantity: { type: Boolean, default: true },
       allowBackorder: { type: Boolean, default: false }
     },
-
     attributes: {
       color: String,
       size: String,
@@ -76,23 +76,17 @@ const productSchema = new Schema<IProduct>(
         height: Number
       }
     },
-
     specifications: {
       type: Map,
       of: Schema.Types.Mixed
     },
-
     tags: [String],
-
-
     status: {
       type: String,
       enum: ["active", "inactive", "draft"],
       default: "draft"
     },
-
     featured: { type: Boolean, default: false },
-
     ratings: {
       average: { type: Number, default: 0 },
       count: { type: Number, default: 0 }

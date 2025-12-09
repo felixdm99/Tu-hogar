@@ -23,17 +23,13 @@ console.log("CORS ACTIVADO");
 app.use(express.json());
 
 
-app.use("/api/users", userRoutes)
+app.use("/api/users", userRoutes);
 app.use ("/api/products", productRoutes)
 app.use("/api/categories", categoryRoutes);
-app.use("/api/orders", orderRoutes )
-app.use("/api/cart", cartRoutes)
-app.use("/api/reviews", reviewRoutes)
+app.use("/api/orders", orderRoutes );
+app.use("/api/cart", cartRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running at http://${hostname}:${PORT}/`);
 });
-
-
-
-
